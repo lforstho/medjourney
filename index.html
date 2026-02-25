@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedJourney</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        background: #f3f7fb;
+        color: #12324a;
+      }
+
+      .app-shell {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 16px 32px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        color: #0b63ce;
+        letter-spacing: 0.04em;
+      }
+
+      header p {
+        margin: 8px 0 0;
+        color: #4a6a86;
+        font-size: 1rem;
+      }
+
+      main {
+        display: grid;
+        gap: 20px;
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px 22px;
+        box-shadow: 0 14px 40px rgba(15, 35, 52, 0.08);
+        border: 1px solid rgba(13, 71, 161, 0.06);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 1.2rem;
+        color: #0b3766;
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+      }
+
+      .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      label {
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #244866;
+      }
+
+      label span {
+        color: #607d8b;
+        font-weight: 400;
+        font-size: 0.85rem;
+      }
+
+      input,
+      textarea {
+        border-radius: 10px;
+        border: 1px solid #c5d4e3;
+        padding: 10px 11px;
+        font-size: 0.96rem;
+        font-family: inherit;
+        color: inherit;
+        background: #f9fbff;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease,
+          background-color 0.15s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #0b63ce;
+        box-shadow: 0 0 0 2px rgba(11, 99, 206, 0.16);
+        background: #ffffff;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .actions {
+        margin-top: 6px;
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      button[type="submit"] {
+        border: none;
+        border-radius: 999px;
+        padding: 11px 26px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #0b63ce, #2c8ed6);
+        color: #ffffff;
+        cursor: pointer;
+        box-shadow: 0 12px 30px rgba(11, 99, 206, 0.25);
+        transition: transform 0.12s ease, box-shadow 0.12s ease,
+          background 0.12s ease;
+      }
+
+      button[type="submit"]:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 34px rgba(11, 99, 206, 0.3);
+      }
+
+      button[type="submit"]:active {
+        transform: translateY(0);
+        box-shadow: 0 8px 20px rgba(11, 99, 206, 0.22);
+      }
+
+      #status {
+        margin-top: 14px;
+        font-size: 0.9rem;
+        color: #4a6a86;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #e7f1ff;
+        border: 1px dashed rgba(11, 99, 206, 0.32);
+      }
+
+      #results-section {
+        display: none;
+      }
+
+      #results-section h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+      }
+
+      .results-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      #results-container {
+        display: grid;
+        gap: 14px;
+      }
+
+      #copy-results-btn {
+        border-radius: 999px;
+        border: 1px solid #c5d4e3;
+        padding: 7px 16px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        background: #f5f9ff;
+        color: #0b3766;
+        cursor: pointer;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease,
+          transform 0.1s ease;
+        display: none;
+      }
+
+      #copy-results-btn:hover {
+        background: #e3efff;
+        box-shadow: 0 4px 10px rgba(11, 99, 206, 0.18);
+        transform: translateY(-1px);
+      }
+
+      #copy-results-btn:active {
+        box-shadow: none;
+        transform: translateY(0);
+      }
+
+      .clinic-card {
+        border-radius: 14px;
+        padding: 16px 18px;
+        background: #f9fbff;
+        border: 1px solid #dde7f3;
+      }
+
+      .clinic-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 6px;
+      }
+
+      .clinic-name {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #0b3766;
+      }
+
+      .clinic-location {
+        font-size: 0.9rem;
+        color: #607d8b;
+      }
+
+      .credibility-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #ffffff;
+        white-space: nowrap;
+      }
+
+      .credibility-high {
+        background: #2e7d32;
+      }
+
+      .credibility-medium {
+        background: #fb8c00;
+      }
+
+      .credibility-low {
+        background: #c62828;
+      }
+
+      .clinic-meta {
+        font-size: 0.9rem;
+        color: #425d73;
+        margin: 4px 0;
+      }
+
+      .clinic-reviews-label {
+        margin-top: 10px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: #0b3766;
+      }
+
+      .clinic-reviews {
+        margin: 6px 0 0;
+        padding: 0;
+        list-style: none;
+        color: #415a70;
+        font-size: 0.86rem;
+      }
+
+      .clinic-reviews li {
+        background: #e7f1ff;
+        border-radius: 10px;
+        padding: 6px 10px;
+        border: 1px solid rgba(11, 99, 206, 0.18);
+        white-space: normal;
+        margin-bottom: 6px;
+        max-width: 100%;
+      }
+
+      .section-divider {
+        height: 1px;
+        background: #dde7f3;
+        margin: 14px 0;
+      }
+
+      .itinerary-list {
+        margin: 6px 0 0;
+        padding-left: 20px;
+        color: #425d73;
+        font-size: 0.9rem;
+      }
+
+      .tip-grid {
+        display: grid;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      .tip-box {
+        background: #f5f9ff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px dashed rgba(11, 99, 206, 0.26);
+        font-size: 0.88rem;
+        color: #3a5367;
+      }
+
+      .tip-box strong {
+        display: block;
+        margin-bottom: 2px;
+        color: #0b3766;
+        font-size: 0.86rem;
+      }
+
+      #history-section h2 {
+        margin-top: 0;
+        margin-bottom: 10px;
+      }
+
+      #history-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        color: #607d8b;
+        font-size: 0.92rem;
+      }
+
+      #history-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+      }
+
+      #history-list li span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #history-list li button {
+        border-radius: 999px;
+        border: 1px solid #c5d4e3;
+        padding: 5px 12px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        background: #f5f9ff;
+        color: #0b3766;
+        cursor: pointer;
+        transition: background-color 0.15s ease, box-shadow 0.15s ease,
+          transform 0.1s ease;
+      }
+
+      #history-list li button:hover {
+        background: #e3efff;
+        box-shadow: 0 4px 10px rgba(11, 99, 206, 0.18);
+        transform: translateY(-1px);
+      }
+
+      #history-list li button:active {
+        box-shadow: none;
+        transform: translateY(0);
+      }
+
+      footer {
+        margin-top: 28px;
+        font-size: 0.8rem;
+        color: #607d8b;
+        text-align: center;
+        padding: 12px 0 4px;
+      }
+
+      @media (max-width: 640px) {
+        .app-shell {
+          margin-top: 24px;
+        }
+
+        .card {
+          padding: 20px 16px;
+        }
+
+        header h1 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header>
+        <h1>MedJourney</h1>
+        <p>Find trusted clinics abroad</p>
+      </header>
+
+      <main>
+        <section class="card" aria-labelledby="search-heading">
+          <h2 id="search-heading">Tell us what you&apos;re looking for</h2>
+          <form id="search-form">
+            <div class="form-row">
+              <label for="procedure">
+                Procedure or treatment
+                <span>(required)</span>
+              </label>
+              <input
+                id="procedure"
+                name="procedure"
+                type="text"
+                required
+                autocomplete="off"
+                placeholder="e.g. knee replacement, IVF, dental implants"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="budget">
+                Your budget in USD
+                <span>(required)</span>
+              </label>
+              <input
+                id="budget"
+                name="budget"
+                type="number"
+                required
+                min="0"
+                step="100"
+                placeholder="e.g. 8000"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="age">
+                Your age
+                <span>(required)</span>
+              </label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                required
+                min="0"
+                max="120"
+                placeholder="e.g. 54"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="countries">
+                Preferred countries or &apos;open to any&apos;
+                <span>(required)</span>
+              </label>
+              <input
+                id="countries"
+                name="countries"
+                type="text"
+                required
+                autocomplete="off"
+                placeholder="e.g. Spain, Turkey, Thailand or &quot;open to any&quot;"
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="context">
+                Any additional health context
+                <span>(optional)</span>
+              </label>
+              <textarea
+                id="context"
+                name="context"
+                placeholder="Share any diagnoses, preferences, or questions you have."
+              ></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit">Search Clinics</button>
+            </div>
+
+            <div id="status">
+              Enter your details above to begin
+            </div>
+          </form>
+        </section>
+
+        <section
+          id="results-section"
+          class="card"
+          aria-labelledby="results-heading"
+        >
+          <h2 id="results-heading">Your Clinic Shortlist</h2>
+          <div class="results-toolbar">
+            <button id="copy-results-btn" type="button">
+              Copy Results to Clipboard
+            </button>
+          </div>
+          <div id="results-container"></div>
+        </section>
+
+        <section
+          id="history-section"
+          class="card"
+          aria-labelledby="history-heading"
+        >
+          <h2 id="history-heading">Past Searches</h2>
+          <ul id="history-list"></ul>
+        </section>
+      </main>
+
+      <footer>
+        MedJourney – for research purposes only. Always consult a qualified
+        medical professional.
+      </footer>
+    </div>
+    <script src="config.js"></script>
+    <script src="config-keys.js"></script>
+    <script>
+      (function () {
+        const form = document.getElementById("search-form");
+        if (!form) return;
+
+        const procedureInput = document.getElementById("procedure");
+        const budgetInput = document.getElementById("budget");
+        const ageInput = document.getElementById("age");
+        const countriesInput = document.getElementById("countries");
+        const contextInput = document.getElementById("context");
+        const statusDiv = document.getElementById("status");
+        const resultsSection = document.getElementById("results-section");
+        const resultsContainer = document.getElementById("results-container");
+        const historyList = document.getElementById("history-list");
+        const copyButton = document.getElementById("copy-results-btn");
+        const submitButton = form.querySelector('button[type="submit"]');
+
+        let lastResult = null;
+        let lastTimestamp = "";
+        let copyResetTimeout = null;
+
+        function setStatus(message) {
+          if (statusDiv) {
+            statusDiv.textContent = message;
+          }
+        }
+
+        function setCurrentResultContext(resultObj, timestamp) {
+          lastResult = resultObj || null;
+          lastTimestamp = timestamp || new Date().toLocaleString();
+
+          if (copyButton) {
+            copyButton.style.display = "inline-flex";
+            copyButton.textContent = "Copy Results to Clipboard";
+          }
+        }
+
+        function extractResponseText(apiData) {
+          if (!apiData) return "";
+
+          if (Array.isArray(apiData.output) && apiData.output.length > 0) {
+            const firstOutput = apiData.output[0];
+            if (
+              firstOutput &&
+              Array.isArray(firstOutput.content) &&
+              firstOutput.content.length > 0
+            ) {
+              const firstContent = firstOutput.content[0];
+              if (typeof firstContent === "string") {
+                return firstContent;
+              }
+              if (firstContent && typeof firstContent.text === "string") {
+                return firstContent.text;
+              }
+              if (
+                firstContent &&
+                firstContent.text &&
+                typeof firstContent.text.value === "string"
+              ) {
+                return firstContent.text.value;
+              }
+            }
+          }
+
+          if (typeof apiData.output_text === "string") {
+            return apiData.output_text;
+          }
+
+          if (
+            Array.isArray(apiData.choices) &&
+            apiData.choices[0] &&
+            apiData.choices[0].message &&
+            typeof apiData.choices[0].message.content === "string"
+          ) {
+            return apiData.choices[0].message.content;
+          }
+
+          return "";
+        }
+
+        function renderResults(data) {
+          if (!resultsContainer || !resultsSection) return;
+
+          resultsContainer.innerHTML = "";
+
+          const clinics = Array.isArray(data && data.clinics)
+            ? data.clinics
+            : [];
+          const itinerary = Array.isArray(data && data.itinerary)
+            ? data.itinerary
+            : [];
+          const travelNotes =
+            data && data.travel_notes ? data.travel_notes : {};
+
+          clinics.forEach(function (clinic) {
+            const card = document.createElement("div");
+            card.className = "clinic-card";
+
+            const header = document.createElement("div");
+            header.className = "clinic-header";
+
+            const nameEl = document.createElement("div");
+            nameEl.className = "clinic-name";
+            nameEl.textContent = clinic.name || "Clinic";
+
+            const locationText = [clinic.city, clinic.country]
+              .filter(Boolean)
+              .join(", ");
+
+            const badge = document.createElement("span");
+            badge.className = "credibility-badge";
+            const rawScore = clinic.credibility_score;
+            const numericScore =
+              typeof rawScore === "number"
+                ? rawScore
+                : parseFloat(rawScore || "");
+            let badgeText = "Credibility: n/a";
+
+            if (!isNaN(numericScore)) {
+              badgeText = "Credibility: " + numericScore.toFixed(1) + "/10";
+              if (numericScore >= 8) {
+                badge.classList.add("credibility-high");
+              } else if (numericScore >= 5) {
+                badge.classList.add("credibility-medium");
+              } else {
+                badge.classList.add("credibility-low");
+              }
+            } else {
+              badge.classList.add("credibility-medium");
+            }
+            badge.textContent = badgeText;
+
+            header.appendChild(nameEl);
+            header.appendChild(badge);
+
+            const locationMeta = document.createElement("div");
+            locationMeta.className = "clinic-meta clinic-location";
+            if (locationText) {
+              locationMeta.textContent = locationText;
+            }
+
+            const specialtyMeta = document.createElement("div");
+            specialtyMeta.className = "clinic-meta";
+            if (clinic.specialty) {
+              specialtyMeta.textContent = "Specialty: " + clinic.specialty;
+            }
+
+            const doctorMeta = document.createElement("div");
+            doctorMeta.className = "clinic-meta";
+            const doctorParts = [];
+            if (clinic.doctor_name) doctorParts.push(clinic.doctor_name);
+            if (clinic.doctor_credentials)
+              doctorParts.push(clinic.doctor_credentials);
+            if (doctorParts.length) {
+              doctorMeta.textContent = "Lead doctor: " + doctorParts.join(" – ");
+            }
+
+            const aboutMeta = document.createElement("div");
+            aboutMeta.className = "clinic-meta";
+            if (clinic.about) {
+              aboutMeta.textContent = clinic.about;
+            }
+
+            const costMeta = document.createElement("div");
+            costMeta.className = "clinic-meta";
+            if (clinic.estimated_cost_usd != null) {
+              costMeta.textContent =
+                "Estimated cost: $" + clinic.estimated_cost_usd;
+            }
+
+            const reviews = Array.isArray(clinic.sample_reviews)
+              ? clinic.sample_reviews
+              : [];
+            let reviewsLabel = null;
+            let reviewsList = null;
+            if (reviews.length) {
+              reviewsLabel = document.createElement("div");
+              reviewsLabel.className = "clinic-reviews-label";
+              reviewsLabel.textContent = "Patient reviews";
+
+              reviewsList = document.createElement("ul");
+              reviewsList.className = "clinic-reviews";
+              reviews.forEach(function (review) {
+                const li = document.createElement("li");
+                li.textContent = review;
+                reviewsList.appendChild(li);
+              });
+            }
+
+            card.appendChild(header);
+            if (locationMeta.textContent) card.appendChild(locationMeta);
+            if (specialtyMeta.textContent) card.appendChild(specialtyMeta);
+            if (doctorMeta.textContent) card.appendChild(doctorMeta);
+            if (aboutMeta.textContent) card.appendChild(aboutMeta);
+            if (costMeta.textContent) card.appendChild(costMeta);
+            if (reviewsLabel && reviewsList) {
+              card.appendChild(reviewsLabel);
+              card.appendChild(reviewsList);
+            }
+
+            resultsContainer.appendChild(card);
+          });
+
+          if (itinerary.length) {
+            const divider = document.createElement("div");
+            divider.className = "section-divider";
+            resultsContainer.appendChild(divider);
+
+            const itHeading = document.createElement("h3");
+            itHeading.textContent = "Suggested itinerary";
+            resultsContainer.appendChild(itHeading);
+
+            const list = document.createElement("ol");
+            list.className = "itinerary-list";
+            itinerary.forEach(function (step) {
+              const li = document.createElement("li");
+              const title =
+                step.title ||
+                "Step " + (step.step_number != null ? step.step_number : "");
+              const desc = step.description || "";
+              li.textContent = desc ? title + " – " + desc : title;
+              list.appendChild(li);
+            });
+            resultsContainer.appendChild(list);
+          }
+
+          const noteKeys = [
+            "accommodation_tip",
+            "transport_tip",
+            "language_tip",
+          ];
+          const hasAnyNotes = noteKeys.some(function (key) {
+            return travelNotes && travelNotes[key];
+          });
+
+          if (hasAnyNotes) {
+            const divider2 = document.createElement("div");
+            divider2.className = "section-divider";
+            resultsContainer.appendChild(divider2);
+
+            const notesHeading = document.createElement("h3");
+            notesHeading.textContent = "Travel notes";
+            resultsContainer.appendChild(notesHeading);
+
+            const grid = document.createElement("div");
+            grid.className = "tip-grid";
+
+            const labels = {
+              accommodation_tip: "Accommodation tip",
+              transport_tip: "Transport tip",
+              language_tip: "Language tip",
+            };
+
+            noteKeys.forEach(function (key) {
+              const value = travelNotes[key];
+              if (!value) return;
+              const box = document.createElement("div");
+              box.className = "tip-box";
+              const strong = document.createElement("strong");
+              strong.textContent = labels[key];
+              const text = document.createElement("div");
+              text.textContent = value;
+              box.appendChild(strong);
+              box.appendChild(text);
+              grid.appendChild(box);
+            });
+
+            resultsContainer.appendChild(grid);
+          }
+
+          resultsSection.style.display = "block";
+        }
+
+        function loadHistoryArray() {
+          try {
+            const raw = localStorage.getItem("medjourney_history");
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch (error) {
+            console.error("MedJourney storage", error);
+            return [];
+          }
+        }
+
+        function saveHistoryArray(historyArray) {
+          try {
+            const json = JSON.stringify(historyArray);
+            localStorage.setItem("medjourney_history", json);
+          } catch (error) {
+            console.error("MedJourney storage error", error);
+          }
+        }
+
+        function saveSearchRecord(structuredResult, procedure, countries, timestamp) {
+          const record = {
+            id: String(Date.now()),
+            timestamp: timestamp || new Date().toLocaleString(),
+            procedure: procedure || "n/a",
+            country: countries || "n/a",
+            result: structuredResult,
+          };
+
+          const existing = loadHistoryArray();
+          existing.unshift(record);
+
+          const limited =
+            existing.length > CONFIG.MAX_SAVED_RUNS
+              ? existing.slice(0, CONFIG.MAX_SAVED_RUNS)
+              : existing;
+
+          saveHistoryArray(limited);
+        }
+
+        function renderHistory() {
+          if (!historyList) return;
+
+          const history = loadHistoryArray();
+          historyList.innerHTML = "";
+
+          history.forEach(function (record) {
+            const li = document.createElement("li");
+
+            const textSpan = document.createElement("span");
+            const procedureText = record.procedure || "Unknown procedure";
+            const countryText = record.country || "Unknown location";
+            const timestampText = record.timestamp || "";
+            textSpan.textContent =
+              procedureText +
+              " – " +
+              countryText +
+              (timestampText ? " (" + timestampText + ")" : "");
+
+            const loadButton = document.createElement("button");
+            loadButton.type = "button";
+            loadButton.textContent = "Load";
+            loadButton.addEventListener("click", function () {
+              restoreResult(record.result, record.timestamp);
+            });
+
+            li.appendChild(textSpan);
+            li.appendChild(loadButton);
+            historyList.appendChild(li);
+          });
+        }
+
+        function restoreResult(resultObj, timestamp) {
+          if (!resultObj) return;
+          renderResults(resultObj);
+          if (resultsSection) {
+            resultsSection.style.display = "block";
+          }
+          setCurrentResultContext(resultObj, timestamp);
+          setStatus("Loaded from history.");
+        }
+
+        function buildExportText() {
+          if (!lastResult) return "";
+
+          const clinics = Array.isArray(lastResult.clinics)
+            ? lastResult.clinics
+            : [];
+          const itinerary = Array.isArray(lastResult.itinerary)
+            ? lastResult.itinerary
+            : [];
+          const travelNotes =
+            lastResult && lastResult.travel_notes ? lastResult.travel_notes : {};
+
+          const lines = [];
+          lines.push("MedJourney Clinic Shortlist");
+          if (lastTimestamp) {
+            lines.push("Search time: " + lastTimestamp);
+          }
+          lines.push("");
+
+          clinics.forEach(function (clinic, index) {
+            lines.push("Clinic " + (index + 1) + ": " + (clinic.name || "N/A"));
+
+            const locationText = [clinic.city, clinic.country]
+              .filter(Boolean)
+              .join(", ");
+            lines.push("Location: " + (locationText || "N/A"));
+
+            const rawScore = clinic.credibility_score;
+            const numericScore =
+              typeof rawScore === "number"
+                ? rawScore
+                : parseFloat(rawScore || "");
+            if (!isNaN(numericScore)) {
+              lines.push(
+                "Credibility score: " + numericScore.toFixed(1) + " / 10"
+              );
+            } else {
+              lines.push("Credibility score: N/A");
+            }
+
+            const doctorParts = [];
+            if (clinic.doctor_name) doctorParts.push(clinic.doctor_name);
+            if (clinic.doctor_credentials)
+              doctorParts.push(clinic.doctor_credentials);
+            lines.push(
+              "Doctor: " +
+                (doctorParts.length ? doctorParts.join(" – ") : "N/A")
+            );
+
+            if (clinic.estimated_cost_usd != null) {
+              lines.push("Estimated cost (USD): " + clinic.estimated_cost_usd);
+            } else {
+              lines.push("Estimated cost (USD): N/A");
+            }
+
+            const reviews = Array.isArray(clinic.sample_reviews)
+              ? clinic.sample_reviews
+              : [];
+            if (reviews.length) {
+              reviews.forEach(function (review, idx) {
+                lines.push("Review " + (idx + 1) + ": " + review);
+              });
+            }
+
+            lines.push("");
+          });
+
+          lines.push("Itinerary:");
+          if (itinerary.length) {
+            itinerary.forEach(function (step, idx) {
+              const stepNumber =
+                step.step_number != null ? step.step_number : idx + 1;
+              const title =
+                step.title || "Step " + (stepNumber != null ? stepNumber : "");
+              const desc = step.description || "";
+              lines.push(
+                stepNumber +
+                  ". " +
+                  title +
+                  (desc ? " - " + desc : "")
+              );
+            });
+          } else {
+            lines.push("No itinerary provided.");
+          }
+
+          lines.push("");
+          lines.push("Travel notes:");
+          lines.push(
+            "Accommodation tip: " +
+              (travelNotes.accommodation_tip || "N/A")
+          );
+          lines.push(
+            "Transport tip: " + (travelNotes.transport_tip || "N/A")
+          );
+          lines.push(
+            "Language tip: " + (travelNotes.language_tip || "N/A")
+          );
+
+          return lines.join("\n");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          renderHistory();
+        });
+
+        if (copyButton) {
+          copyButton.addEventListener("click", async function () {
+            if (!lastResult) return;
+
+            const textToCopy = buildExportText();
+            if (!textToCopy) return;
+
+            if (copyResetTimeout) {
+              clearTimeout(copyResetTimeout);
+            }
+
+            try {
+              await navigator.clipboard.writeText(textToCopy);
+              copyButton.textContent = "Copied!";
+              copyResetTimeout = setTimeout(function () {
+                copyButton.textContent = "Copy Results to Clipboard";
+              }, 2000);
+            } catch (error) {
+              console.error("MedJourney clipboard error", error);
+              copyButton.textContent = "Copy failed – try again";
+            }
+          });
+        }
+
+        form.addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const procedure = procedureInput.value.trim();
+          const budget = budgetInput.value.trim();
+          const age = ageInput.value.trim();
+          const countries = countriesInput.value.trim();
+          const context = contextInput.value.trim();
+
+          setStatus("Searching for clinics...");
+          if (submitButton) {
+            submitButton.disabled = true;
+          }
+
+          const promptLines = [
+            "You are MedJourney, a medical tourism research assistant.",
+            "Given the following patient details, research and recommend suitable clinics abroad.",
+            "Return ONLY a JSON object with this exact structure:",
+            "{",
+            '  "clinics": [',
+            "    {",
+            '      "name": "string",',
+            '      "country": "string",',
+            '      "city": "string",',
+            '      "credibility_score": number (1-10),',
+            '      "specialty": "string",',
+            '      "about": "string",',
+            '      "doctor_name": "string",',
+            '      "doctor_credentials": "string",',
+            '      "sample_reviews": ["string", "string"],',
+            '      "estimated_cost_usd": number',
+            "    }",
+            "  ],",
+            '  "itinerary": [',
+            "    {",
+            '      "step_number": number,',
+            '      "title": "string",',
+            '      "description": "string"',
+            "    }",
+            "  ],",
+            '  "travel_notes": {',
+            '    "accommodation_tip": "string",',
+            '    "transport_tip": "string",',
+            '    "language_tip": "string"',
+            "  }",
+            "}",
+            "",
+            "Patient details:",
+            "Procedure or treatment: " + (procedure || "n/a"),
+            "Budget in USD: " + (budget || "n/a"),
+            "Age: " + (age || "n/a"),
+            "Preferred countries: " + (countries || "n/a"),
+            "Additional health context: " + (context || "n/a"),
+          ];
+
+          const prompt = promptLines.join("\n");
+
+          (async function () {
+            try {
+              const response = await fetch(CONFIG.OPENAI_ENDPOINT, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: "Bearer " + CONFIG_KEYS.OPENAI_API_KEY,
+                },
+                body: JSON.stringify({
+                  model: CONFIG.OPENAI_MODEL,
+                  input: prompt,
+                }),
+              });
+
+              if (!response.ok) {
+                throw new Error(
+                  "HTTP " + response.status + " " + response.statusText
+                );
+              }
+
+              const apiData = await response.json();
+              const text = extractResponseText(apiData);
+
+              if (!text) {
+                throw new Error("Empty response from AI");
+              }
+
+              let structured;
+              try {
+                structured = JSON.parse(text);
+              } catch (parseError) {
+                console.error("MedJourney fetch error", parseError);
+                setStatus(
+                  "The AI response could not be parsed. Please try again."
+                );
+                if (submitButton) {
+                  submitButton.disabled = false;
+                }
+                return;
+              }
+
+              renderResults(structured);
+              const timestamp = new Date().toLocaleString();
+              setCurrentResultContext(structured, timestamp);
+              saveSearchRecord(structured, procedure, countries, timestamp);
+              renderHistory();
+              setStatus(
+                "Results loaded. Scroll down to view your shortlist."
+              );
+              if (submitButton) {
+                submitButton.disabled = false;
+              }
+            } catch (error) {
+              console.error("MedJourney fetch error", error);
+              setStatus(
+                "Something went wrong: " +
+                  (error && error.message ? error.message : String(error))
+              );
+              if (submitButton) {
+                submitButton.disabled = false;
+              }
+            }
+          })();
+        });
+      })();
+    </script>
+  </body>
+</html>
