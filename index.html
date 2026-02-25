@@ -1054,11 +1054,29 @@
 
           (async function () {
             try {
+              const apiKey =
+                window.CONFIG_KEYS && window.CONFIG_KEYS.OPENAI_API_KEY
+                  ? window.CONFIG_KEYS.OPENAI_API_KEY
+                  : "";
+
+              if (!apiKey) {
+                console.error(
+                  "MedJourney config error: CONFIG_KEYS.OPENAI_API_KEY is missing"
+                );
+                setStatus(
+                  "This deployed demo is not configured with an API key."
+                );
+                if (submitButton) {
+                  submitButton.disabled = false;
+                }
+                return;
+              }
+
               const response = await fetch(CONFIG.OPENAI_ENDPOINT, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  Authorization: "Bearer " + CONFIG_KEYS.OPENAI_API_KEY,
+                  Authorization: "Bearer " + apiKey,
                 },
                 body: JSON.stringify({
                   model: CONFIG.OPENAI_MODEL,
